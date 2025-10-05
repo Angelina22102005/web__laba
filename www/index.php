@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Lab 2 - PHP Test</title>
@@ -10,33 +10,34 @@
 </head>
 <body>
     <div class='header'>
-        <h1>Лабораторная работа №2</h1>
+        <h1>Р›Р°Р±РѕСЂР°С‚РѕСЂРЅР°СЏ СЂР°Р±РѕС‚Р° в„–2</h1>
         <h2>Nginx + PHP-FPM + Docker</h2>
-        <p><strong>Студент:</strong> Любанская Ангелина Валерьевна | <strong>Группа:</strong> 3МО-1</p>
+        <p><strong>РЎС‚СѓРґРµРЅС‚:</strong> Р›СЋР±Р°РЅСЃРєР°СЏ РђРЅРіРµР»РёРЅР° Р’Р°Р»РµСЂСЊРµРІРЅР° | <strong>Р“СЂСѓРїРїР°:</strong> 3РњРћ-1</p>
     </div>
     
     <div class='info'>
-        <h3>PHP успешно работает!</h3>
-        <p>Текущая дата и время на сервере: <?php echo date('Y-m-d H:i:s'); ?></p>
-        <p>Версия PHP: <?php echo phpversion(); ?></p>
+        <h3>PHP СѓСЃРїРµС€РЅРѕ СЂР°Р±РѕС‚Р°РµС‚!</h3>
+        <p>РўРµРєСѓС‰Р°СЏ РґР°С‚Р° Рё РІСЂРµРјСЏ РЅР° СЃРµСЂРІРµСЂРµ: <?php echo date('Y-m-d H:i:s'); ?></p>
+        <p>Р’РµСЂСЃРёСЏ PHP: <?php echo phpversion(); ?></p>
     </div>
 
     <nav>
-        <h3>Доступные страницы:</h3>
+        <h3>Р”РѕСЃС‚СѓРїРЅС‹Рµ СЃС‚СЂР°РЅРёС†С‹:</h3>
         <ul>
-            <li><a href='/index.php'>Главная (PHP)</a></li>
+            <li><a href='/index.php'>Р“Р»Р°РІРЅР°СЏ (PHP)</a></li>
             <li><a href='/phpinfo.php'>phpinfo()</a></li>
-            <li><a href='/form.html'>Форма регистрации</a></li>
+            <li><a href='/form.html'>Р¤РѕСЂРјР° СЂРµРіРёСЃС‚СЂР°С†РёРё</a></li>
         </ul>
     </nav>
 
     <?php
     echo '<div class=\"info\">';
-    echo '<h4>Информация о сервере:</h4>';
-    echo '<p>Имя сервера: ' . $_SERVER['SERVER_NAME'] . '</p>';
-    echo '<p>Порт: ' . $_SERVER['SERVER_PORT'] . '</p>';
+    echo '<h4>РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРµСЂРІРµСЂРµ:</h4>';
+    echo '<p>РРјСЏ СЃРµСЂРІРµСЂР°: ' . $_SERVER['SERVER_NAME'] . '</p>';
+    echo '<p>РџРѕСЂС‚: ' . $_SERVER['SERVER_PORT'] . '</p>';
     echo '<p>Software: ' . $_SERVER['SERVER_SOFTWARE'] . '</p>';
     echo '</div>';
     ?>
 </body>
 </html>
+
