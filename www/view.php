@@ -1,5 +1,4 @@
 <?php
-// www/view.php
 session_start();
 ?>
 <!DOCTYPE html>
@@ -71,6 +70,48 @@ session_start();
             margin: 20px 0;
             text-align: center;
         }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-warning {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -79,11 +120,19 @@ session_start();
             <a href='index.php'>Главная</a>
             <a href='phpinfo.php'>PHP Info</a>
             <a href='form.html'>Общая форма</a>
-            <a href='hackathon-form.html'>Хакатон</a>
+            <a href='hackathon-form.php'>Хакатон</a>
             <a href='view.php'>Все участники</a>
         </div>
 
         <h1>Все зарегистрированные участники хакатона</h1>
+
+        <!-- Вывод сообщений -->
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class='success-message'>
+                ✅ <?= htmlspecialchars($_SESSION['message']) ?>
+            </div>
+            <?php unset($_SESSION['message']); ?>
+        <?php endif; ?>
 
         <?php if (file_exists('hackathon_registrations.txt') && filesize('hackathon_registrations.txt') > 0): ?>
             <?php
@@ -156,38 +205,18 @@ session_start();
             <div class='empty-state'>
                 <h3>📝 Данных пока нет</h3>
                 <p>Будьте первым зарегистрированным участником!</p>
-                <a href='hackathon-form.html' style='
-                    background: #28a745;
-                    color: white;
-                    padding: 10px 20px;
-                    text-decoration: none;
-                    border-radius: 4px;
-                    display: inline-block;
-                    margin-top: 15px;
-                '>Зарегистрироваться</a>
             </div>
         <?php endif; ?>
 
-        <div style='text-align: center; margin-top: 30px;'>
-            <a href='index.php' style='
-                background: #6c757d;
-                color: white;
-                padding: 10px 20px;
-                text-decoration: none;
-                border-radius: 4px;
-                display: inline-block;
-                margin-right: 10px;
-            '>На главную</a>
+        <div class='action-buttons'>
+            <a href='index.php' class='btn btn-secondary'>На главную</a>
+            <a href='hackathon-form.php' class='btn btn-primary'>Добавить участника</a>
             
             <?php if (file_exists('hackathon_registrations.txt') && filesize('hackathon_registrations.txt') > 0): ?>
-                <a href='clear-data.php' onclick="return confirm('Вы уверены, что хотите удалить все данные?')" style='
-                    background: #dc3545;
-                    color: white;
-                    padding: 10px 20px;
-                    text-decoration: none;
-                    border-radius: 4px;
-                    display: inline-block;
-                '>Очистить все данные</a>
+                <a href='clear-data.php' class='btn btn-warning' 
+                   onclick="return confirm('⚠️ ВНИМАНИЕ: Вы уверены, что хотите удалить ВСЕ данные? Это действие нельзя отменить!')">
+                    Очистить все данные
+                </a>
             <?php endif; ?>
         </div>
     </div>
