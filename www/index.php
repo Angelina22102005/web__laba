@@ -68,6 +68,47 @@ session_start();
             margin: 20px 0;
             text-align: center;
         }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .welcome-message {
+            text-align: center;
+            padding: 30px;
+            background: #e8f4f8;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -76,11 +117,19 @@ session_start();
             <a href='index.php'>Главная</a>
             <a href='phpinfo.php'>PHP Info</a>
             <a href='form.html'>Общая форма</a>
-            <a href='hackathon-form.html'>Хакатон</a>
+            <a href='hackathon-form.php'>Хакатон</a>
             <a href='view.php'>Все участники</a>
         </div>
 
         <h1>Система регистрации на хакатон</h1>
+
+        <!-- Вывод сообщений -->
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class='success-message'>
+                ✅ <?= htmlspecialchars($_SESSION['message']) ?>
+            </div>
+            <?php unset($_SESSION['message']); ?>
+        <?php endif; ?>
 
         <?php if (isset($_GET['registration']) && $_GET['registration'] == 'success'): ?>
             <div class='success-message'>
@@ -123,7 +172,7 @@ session_start();
                 <div class='data-item'><strong>Время регистрации:</strong> <?= $data['timestamp'] ?></div>
             </div>
         <?php else: ?>
-            <div style='text-align: center; padding: 40px;'>
+            <div class='welcome-message'>
                 <p>Добро пожаловать в систему регистрации на хакатон!</p>
                 <p>Для участия заполните форму регистрации.</p>
             </div>
@@ -141,15 +190,16 @@ session_start();
             <p><strong>Всего зарегистрированных участников:</strong> <?= $totalRegistrations ?></p>
         </div>
 
-        <div style='text-align: center; margin-top: 30px;'>
-            <a href='hackathon-form.html' style='
-                background: #007bff;
-                color: white;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 4px;
-                display: inline-block;
-            '>Зарегистрироваться на хакатон</a>
+        <div class='action-buttons'>
+            <a href='hackathon-form.php' class='btn btn-primary'>Зарегистрироваться на хакатон</a>
+            <a href='view.php' class='btn btn-secondary'>Посмотреть всех участников</a>
+            
+            <?php if (isset($_SESSION['last_registration'])): ?>
+                <a href='clear-session.php' class='btn btn-warning' 
+                   onclick="return confirm('Очистить данные текущей сессии?')">
+                    Очистить сессию
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 </body>
