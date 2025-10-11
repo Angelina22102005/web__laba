@@ -1,36 +1,156 @@
-﻿<!DOCTYPE html>
-<html lang="ru">
+﻿<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html lang='ru'>
 <head>
-    <meta charset="UTF-8">
-    <title>Главная - ЛР3</title>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Главная страница - Хакатон</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: #e9ecef;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border: 1px solid #c3e6cb;
+        }
+        .session-data {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .data-item {
+            margin: 10px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        .stats {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Лабораторная работа №3</h1>
+    <div class='container'>
+        <div class='nav'>
+            <a href='index.php'>Главная</a>
+            <a href='phpinfo.php'>PHP Info</a>
+            <a href='form.html'>Общая форма</a>
+            <a href='hackathon-form.html'>Хакатон</a>
+            <a href='view.php'>Все участники</a>
+        </div>
 
-    <?php
-    session_start();
-    if (isset($_SESSION['errors'])): ?>
-        <ul style="color: red;">
-            <?php foreach ($_SESSION['errors'] as $error): ?>
-                <li><?= $error ?></li>
-            <?php endforeach; ?>
-        </ul>
-        <?php unset($_SESSION['errors']); ?>
-    <?php endif; ?>
+        <h1>Система регистрации на хакатон</h1>
 
-    <?php if (isset($_SESSION['username'])): ?>
-        <h2>Данные из сессии:</h2>
-        <ul>
-            <li>Имя: <?= $_SESSION['username'] ?></li>
-            <li>Email: <?= $_SESSION['email'] ?? 'Не указан' ?></li>
-        </ul>
-    <?php else: ?>
-        <p>Данных в сессии пока нет.</p>
-    <?php endif; ?>
+        <?php if (isset($_GET['registration']) && $_GET['registration'] == 'success'): ?>
+            <div class='success-message'>
+                ✅ Регистрация успешно завершена! Данные сохранены в системе.
+            </div>
+        <?php endif; ?>
 
-    <hr>
-    <a href="form.html">Заполнить форму</a> |
-    <a href="view.php">Посмотреть все данные из файла</a>
+        <?php if (isset($_SESSION['last_registration'])): ?>
+            <div class='session-data'>
+                <h2>Последняя регистрация:</h2>
+                <?php
+                $data = $_SESSION['last_registration'];
+                $directionNames = [
+                    'web-development' => 'Веб-разработка',
+                    'mobile-development' => 'Мобильная разработка',
+                    'ai-ml' => 'Искусственный интеллект и ML',
+                    'blockchain' => 'Блокчейн технологии',
+                    'iot' => 'Интернет вещей (IoT)',
+                    'cybersecurity' => 'Кибербезопасность',
+                    'data-science' => 'Data Science',
+                    'game-dev' => 'Разработка игр'
+                ];
+                $roleNames = [
+                    'backend' => 'Backend-разработчик',
+                    'frontend' => 'Frontend-разработчик',
+                    'fullstack' => 'Fullstack-разработчик',
+                    'designer' => 'UI/UX дизайнер',
+                    'data' => 'Data Scientist'
+                ];
+                ?>
+                <div class='data-item'><strong>Имя:</strong> <?= htmlspecialchars($data['fullName']) ?></div>
+                <div class='data-item'><strong>Возраст:</strong> <?= htmlspecialchars($data['age']) ?></div>
+                <div class='data-item'><strong>Направление:</strong> <?= $directionNames[$data['direction']] ?? $data['direction'] ?></div>
+                <div class='data-item'><strong>Роль:</strong> <?= $roleNames[$data['teamRole']] ?? $data['teamRole'] ?></div>
+                <div class='data-item'><strong>Email:</strong> <?= htmlspecialchars($data['email']) ?></div>
+                <div class='data-item'><strong>Опыт участия:</strong> <?= $data['previousExperience'] ?></div>
+                <div class='data-item'><strong>Воркшопы:</strong> <?= $data['workshop'] ?></div>
+                <div class='data-item'><strong>Ментор:</strong> <?= $data['mentoring'] ?></div>
+                <div class='data-item'><strong>Рассылка:</strong> <?= $data['newsletter'] ?></div>
+                <div class='data-item'><strong>Время регистрации:</strong> <?= $data['timestamp'] ?></div>
+            </div>
+        <?php else: ?>
+            <div style='text-align: center; padding: 40px;'>
+                <p>Добро пожаловать в систему регистрации на хакатон!</p>
+                <p>Для участия заполните форму регистрации.</p>
+            </div>
+        <?php endif; ?>
 
+        <div class='stats'>
+            <?php
+            $totalRegistrations = 0;
+            if (file_exists('hackathon_registrations.txt')) {
+                $lines = file('hackathon_registrations.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                $totalRegistrations = count($lines);
+            }
+            ?>
+            <h3>Статистика регистраций</h3>
+            <p><strong>Всего зарегистрированных участников:</strong> <?= $totalRegistrations ?></p>
+        </div>
+
+        <div style='text-align: center; margin-top: 30px;'>
+            <a href='hackathon-form.html' style='
+                background: #007bff;
+                color: white;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 4px;
+                display: inline-block;
+            '>Зарегистрироваться на хакатон</a>
+        </div>
+    </div>
 </body>
 </html>
