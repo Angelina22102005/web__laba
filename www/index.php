@@ -23,12 +23,12 @@
     </div>
 
     <nav>
-        <h3>Доступные страницы:</h3>
+        <h3>🌐 Доступные страницы:</h3>
         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
             <a href='/index.php' style="padding: 8px 15px; background: #3498db; color: white; text-decoration: none; border-radius: 5px;">🏠 Главная</a>
             <a href='/phpinfo.php' style="padding: 8px 15px; background: #9b59b6; color: white; text-decoration: none; border-radius: 5px;">ℹ️ PHP Info</a>
             <a href='/hackathon-form.php' style="padding: 8px 15px; background: #2ecc71; color: white; text-decoration: none; border-radius: 5px;">📝 Регистрация</a>
-            <a href='/view.php' style="padding: 8px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px;">👥 Все участники</a>
+            a href='/view.php' style="padding: 8px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px;">👥 Все участники</a>
             <a href='/form.html' style="padding: 8px 15px; background: #f39c12; color: white; text-decoration: none; border-radius: 5px;">📋 Общая форма</a>
         </div>
     </nav>
