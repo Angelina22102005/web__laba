@@ -43,6 +43,21 @@ $_SESSION['form_data'] = [
     'registration_date' => date('Y-m-d H:i:s')
 ];
 
+$dataLine = date('Y-m-d H:i:s') . '|' . 
+            $fullName . '|' . 
+            $age . '|' . 
+            $direction . '|' . 
+            $teamRole . '|' . 
+            $email . '|' . 
+            $previousExperience . '|' . 
+            $workshop . '|' . 
+            $mentoring . '|' . 
+            $newsletter . "\n";
+
+// Сохраняем в файл
+file_put_contents('registrations.txt', $dataLine, FILE_APPEND);
+
+error_log("Сохранено в сессию: " . print_r($_SESSION['form_data'], true));
 // Перенаправляем на главную страницу
 header("Location: index.php");
 exit();
