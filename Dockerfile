@@ -16,9 +16,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Устанавливаем расширения PHP
 RUN docker-php-ext-install pdo pdo_mysql mysqli mbstring exif pcntl bcmath gd
 
-# Устанавливаем Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
 # Создаем рабочую директорию
 WORKDIR /var/www/html
 
