@@ -1,22 +1,14 @@
-<?php session_start(); ?>
+﻿<?php 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang='ru'>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Регистрация на хакатон</title>
-
-    <?php if(isset($_SESSION['errors'])): ?>
-        <div style="color: red; background: #ffeaea; padding: 10px; border-radius: 5px; margin-bottom: 20px; border: 1px solid red;">
-            <strong>Обнаружены ошибки:</strong>
-            <ul>
-                <?php foreach($_SESSION['errors'] as $error): ?>
-                    <li><?= $error ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-        <?php unset($_SESSION['errors']); ?>
-    <?php endif; ?>
+    <title>Регистрация на хакатон - Lab 4</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,20 +17,17 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-        
         .form-container {
             background: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 20px;
         }
-        
         .form-group {
             margin-bottom: 25px;
             padding: 15px;
@@ -46,7 +35,6 @@
             border-radius: 6px;
             background: #fafafa;
         }
-        
         label {
             display: block;
             margin-bottom: 10px;
@@ -54,11 +42,9 @@
             color: #333;
             font-size: 16px;
         }
-        
         .required {
             color: red;
         }
-        
         input[type='text'],
         input[type='number'],
         input[type='email'],
@@ -70,29 +56,21 @@
             font-size: 16px;
             margin-bottom: 5px;
         }
-        
-        /* Стили для групп радио-кнопок и чекбоксов */
         .radio-group, .checkbox-group {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-        
-        /* Каждый элемент радио-кнопки или чекбокса */
         .radio-item, .checkbox-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
         }
-        
-        /* Стили для самих радио-кнопок и чекбоксов */
         .radio-item input[type='radio'],
         .checkbox-item input[type='checkbox'] {
             margin-top: 2px;
             flex-shrink: 0;
         }
-        
-        /* Текст метки */
         .radio-item label,
         .checkbox-item label {
             margin: 0;
@@ -100,8 +78,6 @@
             cursor: pointer;
             line-height: 1.4;
         }
-        
-        /* Подсказки */
         .field-hint {
             font-size: 13px;
             color: #666;
@@ -109,16 +85,6 @@
             font-style: italic;
             line-height: 1.4;
         }
-        
-        /* Подсказки для отдельных пунктов */
-        .item-hint {
-            font-size: 12px;
-            color: #888;
-            margin-top: 2px;
-            display: block;
-            font-style: italic;
-        }
-        
         button {
             background: #4CAF50;
             color: white;
@@ -130,22 +96,51 @@
             width: 100%;
             margin-top: 10px;
         }
-        
         button:hover {
             background: #45a049;
+        }
+        .nav {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .nav a {
+            margin: 0 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .error {
+            color: red;
+            background: #ffeaea;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid red;
         }
     </style>
 </head>
 <body>
     <div class='form-container'>
-         <div class='nav'>
+        <div class='nav'>
             <a href='/index.php'>Главная</a>
-            <a href='/phpinfo.php'>PHP Info</a>
-            <a href='/form.html'>Общая форма</a>
-            <a href='/hackathon-form.html'>Хакатон</a>
+            <a href='/view.php'>Все участники</a>
+            <a href='/test-userinfo.php'>Тест UserInfo</a>
         </div>
-        <h1>Регистрация на хакатон</h1>
         
+        <h1>Регистрация на хакатон - Lab 4</h1>
+
+        <!-- Блок для вывода ошибок -->
+        <?php if(isset($_SESSION['errors'])): ?>
+            <div class='error'>
+                <strong>Обнаружены ошибки:</strong>
+                <ul>
+                    <?php foreach($_SESSION['errors'] as $error): ?>
+                        <li><?= $error ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php unset($_SESSION['errors']); ?>
+        <?php endif; ?>
+
         <form id='hackathonForm' action='process.php' method='POST'>
             <!-- Полное имя -->
             <div class='form-group'>
@@ -176,20 +171,6 @@
                     <option value='game-dev'>Разработка игр</option>
                 </select>
                 <div class='field-hint'>Выберите наиболее интересное для вас направление</div>
-            </div>
-
-            <!-- Опыт участия -->
-            <div class='form-group'>
-                <label>Опыт участия в хакатонах:</label>
-                <div class='checkbox-group'>
-                    <div class='checkbox-item'>
-                        <input type='checkbox' id='previousExperience' name='previousExperience' value='yes'>
-                        <label for='previousExperience'>
-                            У меня есть опыт участия в хакатонах
-                            <span class='item-hint'>Отметьте, если уже участвовали в подобных мероприятиях</span>
-                        </label>
-                    </div>
-                </div>
             </div>
 
             <!-- Роль в команде -->
@@ -227,6 +208,17 @@
                 <div class='field-hint'>На этот email придет подтверждение регистрации</div>
             </div>
 
+            <!-- Опыт участия -->
+            <div class='form-group'>
+                <label>Опыт участия в хакатонах:</label>
+                <div class='checkbox-group'>
+                    <div class='checkbox-item'>
+                        <input type='checkbox' id='previousExperience' name='previousExperience' value='yes'>
+                        <label for='previousExperience'>У меня есть опыт участия в хакатонах</label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Дополнительные опции -->
             <div class='form-group'>
                 <label>Дополнительные опции:</label>
@@ -246,16 +238,16 @@
                 </div>
             </div>
 
-            <button type='submit'>Зарегистрироваться</button>
+            <button type='submit'>Зарегистрироваться на хакатон</button>
         </form>
     </div>
 
     <script>
-    document.getElementById('hackathonForm').addEventListener('submit', function(e) {
-        const fullName = document.getElementById('fullName').value;
-        const email = document.getElementById('email').value;
-        alert('Данные будут отправлены на сервер:\nИмя: ' + fullName + '\nEmail: ' + email);
-    });
+        document.getElementById('hackathonForm').addEventListener('submit', function(e) {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            alert('Данные будут отправлены на сервер:\nИмя: ' + fullName + '\nEmail: ' + email);
+        });
     </script>
 </body>
 </html>
