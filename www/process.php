@@ -6,6 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 // Подключаем наши классы
 require_once 'ApiClient.php';
 require_once 'UserInfo.php';
+require_once 'Database.php';
+require_once 'HackathonRegistration.php';
+
+// Инициализируем базу данных
+$database = new Database();
+$hackathonRegistration = new HackathonRegistration($database);
 
 // Получаем данные из формы
 $fullName = htmlspecialchars($_POST['fullName'] ?? '');
@@ -13,10 +19,10 @@ $age = htmlspecialchars($_POST['age'] ?? '');
 $direction = htmlspecialchars($_POST['direction'] ?? '');
 $teamRole = htmlspecialchars($_POST['teamRole'] ?? '');
 $email = htmlspecialchars($_POST['email'] ?? '');
-$previousExperience = isset($_POST['previousExperience']) ? 'Да' : 'Нет';
-$workshop = isset($_POST['workshop']) ? 'Да' : 'Нет';
-$mentoring = isset($_POST['mentoring']) ? 'Да' : 'Нет';
-$newsletter = isset($_POST['newsletter']) ? 'Да' : 'Нет';
+$previousExperience = isset($_POST['previousExperience']) ? true : false;
+$workshop = isset($_POST['workshop']) ? true : false;
+$mentoring = isset($_POST['mentoring']) ? true : false;
+$newsletter = isset($_POST['newsletter']) ? true : false;
 
 // ВАЛИДАЦИЯ ДАННЫХ
 $errors = [];
@@ -34,6 +40,27 @@ if (!empty($errors)) {
     exit();
 }
 
+// СОХРАНЕНИЕ ДАННЫХ В БАЗУ ДАННЫХ
+$registrationData = [
+    'full_name' => $fullName,
+    'age' => $age,
+    'email' => $email,
+    'direction' => $direction,
+    'team_role' => $teamRole,
+    'previous_experience' => $previousExperience,
+    'workshop' => $workshop,
+    'mentoring' => $mentoring,
+    'newsletter' => $newsletter
+];
+
+$dbResult = $hackathonRegistration->addRegistration($registrationData);
+
+if (!$dbResult['success']) {
+    $_SESSION['errors'] = ['Ошибка сохранения в базу данных: ' . $dbResult['error']];
+    header("Location: hackathon-form.php");
+    exit();
+}
+
 // СОХРАНЕНИЕ ДАННЫХ В СЕССИЮ
 $_SESSION['form_data'] = [
     'fullName' => $fullName,
@@ -41,11 +68,12 @@ $_SESSION['form_data'] = [
     'direction' => $direction,
     'teamRole' => $teamRole,
     'email' => $email,
-    'previousExperience' => $previousExperience,
-    'workshop' => $workshop,
-    'mentoring' => $mentoring,
-    'newsletter' => $newsletter,
-    'registration_date' => date('Y-m-d H:i:s')
+    'previousExperience' => $previousExperience ? 'Да' : 'Нет',
+    'workshop' => $workshop ? 'Да' : 'Нет',
+    'mentoring' => $mentoring ? 'Да' : 'Нет',
+    'newsletter' => $newsletter ? 'Да' : 'Нет',
+    'registration_date' => date('Y-m-d H:i:s'),
+    'db_id' => $dbResult['id'] ?? null
 ];
 
 // ПОЛУЧЕНИЕ ДАННЫХ ИЗ API
@@ -74,17 +102,17 @@ try {
     ];
 }
 
-// СОХРАНЕНИЕ В ФАЙЛ
+// СОХРАНЕНИЕ В ФАЙЛ (резервное копирование)
 $dataLine = date('Y-m-d H:i:s') . '|' . 
             $fullName . '|' . 
             $age . '|' . 
             $direction . '|' . 
             $teamRole . '|' . 
             $email . '|' . 
-            $previousExperience . '|' . 
-            $workshop . '|' . 
-            $mentoring . '|' . 
-            $newsletter . "\n";
+            ($previousExperience ? 'Да' : 'Нет') . '|' . 
+            ($workshop ? 'Да' : 'Нет') . '|' . 
+            ($mentoring ? 'Да' : 'Нет') . '|' . 
+            ($newsletter ? 'Да' : 'Нет') . "\n";
 
 file_put_contents('registrations.txt', $dataLine, FILE_APPEND);
 
@@ -95,7 +123,9 @@ $submissionCount = UserInfo::getSubmissionCount();
 // Добавляем информацию о куках в сессию для отображения
 $_SESSION['cookie_info'] = [
     'last_submission' => UserInfo::getLastSubmission(),
-    'submission_count' => $submissionCount
+    'submission_count' => $submissionCount,
+    'db_success' => $dbResult['success'],
+    'db_message' => $dbResult['message'] ?? 'Данные сохранены'
 ];
 
 // Перенаправляем на главную
