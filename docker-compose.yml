@@ -1,9 +1,58 @@
-﻿version: "3.9"
+﻿version: '3.8'
 
 services:
-  web:
-    image: nginx:1.27-alpine
+  nginx:
+    image: nginx:alpine
+    container_name: lab5-nginx
     ports:
-      - "9000:80"
+      - '8080:80'
     volumes:
-      - ./code:/usr/share/nginx/html
+      - ./www:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - lab-network
+
+  php:
+    build: .
+    container_name: lab5-php
+    volumes:
+      - ./www:/var/www/html
+    working_dir: /var/www/html
+    networks:
+      - lab-network
+
+  db:
+    image: mysql:8.0
+    container_name: lab5-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: hackathon_db
+      MYSQL_USER: hackathon_user
+      MYSQL_PASSWORD: hackathon_pass
+    ports:
+      - '3307:3306'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - lab-network
+
+  adminer:
+    image: adminer
+    container_name: lab5-adminer
+    restart: always
+    ports:
+      - '8081:8080'
+    depends_on:
+      - db
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
+
+volumes:
+  db_data:
