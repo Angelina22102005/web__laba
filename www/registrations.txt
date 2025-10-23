@@ -1,0 +1,11 @@
+2025-10-15 22:02:27|ааааа|45|data-science|backend|CAngelina@stud.kantiana.ru|Да|Да|Нет|Нет
+2025-10-15 22:04:55|Ангелина|19|web-development|designer|chumachenkoangelina@gmail.com|Нет|Нет|Нет|Да
+2025-10-15 22:08:51|Ангелина|19|web-development|designer|chumachenkoangelina@gmail.com|Нет|Нет|Нет|Да
+2025-10-15 22:10:00|кузя|50|mobile-development|backend|tchumachenkoangelina@yandex.ru|Да|Да|Нет|Нет
+2025-10-15 22:11:55|пп|43|cybersecurity|backend|CAngelina@stud.kantiana.ru|Нет|Нет|Нет|Нет
+2025-10-15 22:14:36|рр|32|ai-ml|frontend|tchumachenkoangelina@yandex.ru|Нет|Нет|Нет|Нет
+2025-10-15 22:15:45|ррр|35|ai-ml|frontend|tchumachenkoangelina@yandex.ru|Нет|Нет|Нет|Нет
+2025-10-16 13:04:18|Ангелина|18|blockchain|fullstack|chumachenkoangelina@gmail.com|Нет|Нет|Нет|Нет
+2025-10-16 13:05:34|ffff|41|ai-ml|data|tchumachenkoangelina@yandex.ru|Нет|Нет|Нет|Нет
+2025-10-16 13:47:33|лина|37|ai-ml|frontend|chumachenkoangelina@gmail.com|Нет|Нет|Нет|Нет
+2025-10-16 13:48:48|ольга|23|cybersecurity|frontend|tchumachenkoangelina@yandex.ru|Нет|Нет|Нет|Нет
