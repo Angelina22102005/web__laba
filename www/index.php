@@ -90,76 +90,76 @@ use App\ClickhouseExample;
 
         <?php
         // Redis Demo
-        echo \"<div class='db-section redis'>\";
-        echo \"<h3>🔴 Redis Demo - Key/Value Store</h3>\";
+        echo "<div class='db-section redis'>";
+        echo "<h3>🔴 Redis Demo - Key/Value Store</h3>";
         try {
-            \ = new RedisExample();
+            $redis = new RedisExample();
             
             // Set some values
-            echo \"<h4>Setting values:</h4>\";
-            echo \"<pre>\";
-            echo \->setValue('movie:title', 'Inception');
-            echo \->setValue('movie:year', '2010');
-            echo \->setValue('movie:director', 'Christopher Nolan');
-            echo \"</pre>\";
+            echo "<h4>Setting values:</h4>";
+            echo "<pre>";
+            echo $redis->setValue('movie:title', 'Inception');
+            echo $redis->setValue('movie:year', '2010');
+            echo $redis->setValue('movie:director', 'Christopher Nolan');
+            echo "</pre>";
             
             // Get values
-            echo \"<h4>Getting values:</h4>\";
-            echo \"<pre>\";
-            echo \"Title: \" . \->getValue('movie:title');
-            echo \"Year: \" . \->getValue('movie:year'); 
-            echo \"Director: \" . \->getValue('movie:director');
-            echo \"</pre>\";
+            echo "<h4>Getting values:</h4>";
+            echo "<pre>";
+            echo "Title: " . $redis->getValue('movie:title');
+            echo "Year: " . $redis->getValue('movie:year'); 
+            echo "Director: " . $redis->getValue('movie:director');
+            echo "</pre>";
             
-        } catch (Exception \) {
-            echo \"<p style='color: red;'>Redis Error: \" . \->getMessage() . \"</p>\";
+        } catch (Exception $e) {
+            echo "<p style='color: red;'>Redis Error: " . $e->getMessage() . "</p>";
         }
-        echo \"</div>\";
+        echo "</div>";
 
         // Service Status
-        echo \"<div class='db-section'>\";
-        echo \"<h3>🌐 Service Status</h3>\";
+        echo "<div class='db-section'>";
+        echo "<h3>🌐 Service Status</h3>";
         
         // Check Redis
         try {
             if (extension_loaded('redis')) {
-                \ = new Redis();
-                if (\->connect('redis', 6379, 2)) {
-                    echo \"<p style='color: green;'>✅ Redis: Connected and working</p>\";
+                $redis = new Redis();
+                if ($redis->connect('redis', 6379, 2)) {
+                    echo "<p style='color: green;'>✅ Redis: Connected and working</p>";
                 } else {
-                    echo \"<p style='color: red;'>❌ Redis: Connection failed</p>\";
+                    echo "<p style='color: red;'>❌ Redis: Connection failed</p>";
                 }
             } else {
-                echo \"<p style='color: orange;'>⚠️ Redis extension not loaded</p>\";
+                echo "<p style='color: orange;'>⚠️ Redis extension not loaded</p>";
             }
-        } catch (Exception \) {
-            echo \"<p style='color: red;'>❌ Redis Error: \" . \->getMessage() . \"</p>\";
+        } catch (Exception $e) {
+            echo "<p style='color: red;'>❌ Redis Error: " . $e->getMessage() . "</p>";
         }
         
         // Check MySQL
         try {
-            \ = new PDO('mysql:host=db;dbname=hackathon_db', 'hackathon_user', 'hackathon_pass');
-            echo \"<p style='color: green;'>✅ MySQL: Connected and working</p>\";
-        } catch (Exception \) {
-            echo \"<p style='color: red;'>❌ MySQL Error: \" . \->getMessage() . \"</p>\";
+            $pdo = new PDO('mysql:host=db;dbname=hackathon_db', 'hackathon_user', 'hackathon_pass');
+            echo "<p style='color: green;'>✅ MySQL: Connected and working</p>";
+        } catch (Exception $e) {
+            echo "<p style='color: red;'>❌ MySQL Error: " . $e->getMessage() . "</p>";
         }
         
-        echo \"</div>\";
+        echo "</div>";
 
         // PHP Info
-        echo \"<div class='db-section'>\";
-        echo \"<h3>🐘 PHP Information</h3>\";
-        echo \"<p><strong>PHP Version:</strong> \" . phpversion() . \"</p>\";
-        echo \"<p><strong>Server Time:</strong> \" . date('Y-m-d H:i:s') . \"</p>\";
+        echo "<div class='db-section'>";
+        echo "<h3>🐘 PHP Information</h3>";
+        echo "<p><strong>PHP Version:</strong> " . phpversion() . "</p>";
+        echo "<p><strong>Server Time:</strong> " . date('Y-m-d H:i:s') . "</p>";
         
         // Check autoload
         try {
             require_once 'vendor/autoload.php';
-            echo \"<p style='color: green;'>✅ Composer autoload is working</p>\";
-        } catch (Exception \) {
-            echo \"<p style='color: red;'>❌ Autoload error: \" . \->getMessage() . \"</p>\";
+            echo "<p style='color: green;'>✅ Composer autoload is working</p>";
+        } catch (Exception $e) {
+            echo "<p style='color: red;'>❌ Autoload error: " . $e->getMessage() . "</p>";
         }
-        echo \"</div>\";
+        echo "</div>";
         ?>
     </div>
 </body>
