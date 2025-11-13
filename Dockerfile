@@ -7,12 +7,19 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install pdo pdo_mysql zip
 
+# Устанавливаем Redis extension
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Устанавливаем Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
-COPY ./www /var/www/html
 
-RUN composer install
+# Копируем composer.json сначала для кэширования
+COPY ./www/composer.json ./
+RUN composer install --no-dev --optimize-autoloader
 
-CMD ["php-fpm"]
+# Копируем остальные файлы
+COPY ./www ./
+
+CMD [\"php-fpm\"]
