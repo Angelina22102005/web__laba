@@ -7,12 +7,12 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install pdo pdo_mysql zip
 
-# Устанавливаем Redis extension
+# Устанавливаем Redis extension правильно
 RUN pecl install redis && docker-php-ext-enable redis
 
 WORKDIR /var/www/html
 
-# Просто копируем все файлы
-COPY www/ ./
+# Копируем все файлы
+COPY ./www ./
 
 CMD ["php-fpm"]

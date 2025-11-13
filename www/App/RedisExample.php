@@ -1,5 +1,4 @@
-﻿<?php
-
+<?php
 namespace App;
 
 class RedisExample
@@ -8,14 +7,12 @@ class RedisExample
 
     public function __construct()
     {
-        // Проверяем доступно ли Redis расширение
-        if (!extension_loaded('redis')) {
-            throw new \Exception('Redis extension not loaded');
+        if (!extension_loaded("redis")) {
+            throw new \Exception("Redis extension not loaded");
         }
         
         $this->redis = new \Redis();
-        $this->redis->connect('redis', 6379, 5);
-        $this->redis->setOption(\Redis::OPT_READ_TIMEOUT, -1);
+        $this->redis->connect("redis", 6379, 5);
     }
 
     public function setValue($key, $value)

@@ -1,34 +1,28 @@
-﻿<?php
-// Simple autoloader for testing
-spl_autoload_register(function (\) {
+<?php
+spl_autoload_register(function ($class) {
     // Project-specific namespace prefix
-    \ = 'App\\\\';
+    $prefix = "App\\";
     
     // Base directory for the namespace prefix
-    \ = __DIR__ . '/../';
+    $base_dir = __DIR__ . "/../";
     
     // Does the class use the namespace prefix?
-    \ = strlen(\);
-    if (strncmp(\, \, \) !== 0) {
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
         // No, move to the next registered autoloader
         return;
     }
     
     // Get the relative class name
-    \ = substr(\, \);
+    $relative_class = substr($class, $len);
     
     // Replace the namespace prefix with the base directory, replace namespace
     // separators with directory separators in the relative class name, append
     // with .php
-    \ = \ . str_replace('\\\\', '/', \) . '.php';
+    $file = $base_dir . str_replace("\\", "/", $relative_class) . ".php";
     
     // If the file exists, require it
-    if (file_exists(\)) {
-        require \;
+    if (file_exists($file)) {
+        require $file;
     }
 });
-
-// Include Guzzle manually if needed
-if (file_exists(__DIR__ . '/../guzzlehttp/guzzle/src/functions_include.php')) {
-    require_once __DIR__ . '/../guzzlehttp/guzzle/src/functions_include.php';
-}

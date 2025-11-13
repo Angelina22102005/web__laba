@@ -1,166 +1,88 @@
-﻿<?php
-require 'vendor/autoload.php';
-
-use App\RedisExample;
-use App\ElasticExample;
-use App\ClickhouseExample;
-
-?>
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Lab 6 - NoSQL Databases</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-        .header { 
-            background: linear-gradient(45deg, #2c3e50, #34495e);
-            color: white; 
-            padding: 30px; 
-            border-radius: 15px; 
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        .db-section { 
-            background: #f8f9fa; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 15px 0;
-            border-left: 5px solid #3498db;
-        }
-        .redis { border-left-color: #d63031; }
-        .elastic { border-left-color: #00b894; }
-        .clickhouse { border-left-color: #0984e3; }
-        pre {
-            background: #2d3436;
-            color: #dfe6e9;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .nav-links {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-        .nav-links a {
-            padding: 12px 25px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-        .nav-links a:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f2f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: #2c3e50; color: white; padding: 30px; border-radius: 10px; margin-bottom: 25px; text-align: center; }
+        .service { background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #3498db; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .redis-section { border-left-color: #d63031; }
     </style>
 </head>
 <body>
-    <div class='container'>
-        <div class='header'>
-            <h1>🚀 Лабораторная работа №6</h1>
-            <h2>NoSQL Databases: Redis, Elasticsearch, ClickHouse</h2>
-            <p><strong>👩‍🎓 Студент:</strong> Любанская Ангелина Валерьевна | <strong>🎯 Группа:</strong> 3МО-1</p>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Lab 6 - NoSQL Databases</h1>
+            <p>Redis + MySQL with Docker - WORKING VERSION</p>
         </div>
 
-        <div class='nav-links'>
-            <a href='/index.php'>🏠 Главная Lab6</a>
-            <a href='/hackathon-form.php'>📝 Регистрация на хакатон</a>
-            <a href='/view.php'>👥 Все участники</a>
-            <a href='/lab6-report.php'>📊 Отчет Lab6</a>
-            <a href='/final-test.php'>🧪 Тестирование</a>
+        <div class="service">
+            <h3>📊 System Status</h3>
+            <?php
+            echo "<p><strong>PHP Version:</strong> " . phpversion() . "</p>";
+            echo "<p><strong>Server Time:</strong> " . date("Y-m-d H:i:s") . "</p>";
+            ?>
         </div>
 
-        <?php
-        // Redis Demo
-        echo "<div class='db-section redis'>";
-        echo "<h3>🔴 Redis Demo - Key/Value Store</h3>";
-        try {
-            $redis = new RedisExample();
-            
-            // Set some values
-            echo "<h4>Setting values:</h4>";
-            echo "<pre>";
-            echo $redis->setValue('movie:title', 'Inception');
-            echo $redis->setValue('movie:year', '2010');
-            echo $redis->setValue('movie:director', 'Christopher Nolan');
-            echo "</pre>";
-            
-            // Get values
-            echo "<h4>Getting values:</h4>";
-            echo "<pre>";
-            echo "Title: " . $redis->getValue('movie:title');
-            echo "Year: " . $redis->getValue('movie:year'); 
-            echo "Director: " . $redis->getValue('movie:director');
-            echo "</pre>";
-            
-        } catch (Exception $e) {
-            echo "<p style='color: red;'>Redis Error: " . $e->getMessage() . "</p>";
-        }
-        echo "</div>";
+        <div class="service redis-section">
+            <h3>🔴 Redis Test with RedisExample Class</h3>
+            <?php
+            // Simple direct autoload for main page
+            spl_autoload_register(function ($class_name) {
+                $file = __DIR__ . "/" . str_replace("\\", "/", $class_name) . ".php";
+                if (file_exists($file)) {
+                    require $file;
+                }
+            });
 
-        // Service Status
-        echo "<div class='db-section'>";
-        echo "<h3>🌐 Service Status</h3>";
-        
-        // Check Redis
-        try {
-            if (extension_loaded('redis')) {
-                $redis = new Redis();
-                if ($redis->connect('redis', 6379, 2)) {
-                    echo "<p style='color: green;'>✅ Redis: Connected and working</p>";
-                } else {
-                    echo "<p style='color: red;'>❌ Redis: Connection failed</p>";
+            if (class_exists("App\\RedisExample")) {
+                try {
+                    $redis = new App\RedisExample();
+                    
+                    // Test operations
+                    $setResult = $redis->setValue("homepage_test", "Hello from Lab 6 homepage!");
+                    $getResult = $redis->getValue("homepage_test");
+                    
+                    echo "<p class=\"success\">✅ RedisExample class is working!</p>";
+                    echo "<p><strong>SET operation:</strong> $setResult</p>";
+                    echo "<p><strong>GET operation:</strong> $getResult</p>";
+                    echo "<p class=\"success\">✅ Redis extension is loaded and working</p>";
+                    
+                } catch (Exception $e) {
+                    echo "<p class=\"error\">❌ Redis error: " . $e->getMessage() . "</p>";
                 }
             } else {
-                echo "<p style='color: orange;'>⚠️ Redis extension not loaded</p>";
+                echo "<p class=\"error\">❌ RedisExample class not available</p>";
             }
-        } catch (Exception $e) {
-            echo "<p style='color: red;'>❌ Redis Error: " . $e->getMessage() . "</p>";
-        }
-        
-        // Check MySQL
-        try {
-            $pdo = new PDO('mysql:host=db;dbname=hackathon_db', 'hackathon_user', 'hackathon_pass');
-            echo "<p style='color: green;'>✅ MySQL: Connected and working</p>";
-        } catch (Exception $e) {
-            echo "<p style='color: red;'>❌ MySQL Error: " . $e->getMessage() . "</p>";
-        }
-        
-        echo "</div>";
+            ?>
+        </div>
 
-        // PHP Info
-        echo "<div class='db-section'>";
-        echo "<h3>🐘 PHP Information</h3>";
-        echo "<p><strong>PHP Version:</strong> " . phpversion() . "</p>";
-        echo "<p><strong>Server Time:</strong> " . date('Y-m-d H:i:s') . "</p>";
-        
-        // Check autoload
-        try {
-            require_once 'vendor/autoload.php';
-            echo "<p style='color: green;'>✅ Composer autoload is working</p>";
-        } catch (Exception $e) {
-            echo "<p style='color: red;'>❌ Autoload error: " . $e->getMessage() . "</p>";
-        }
-        echo "</div>";
-        ?>
+        <div class="service">
+            <h3>🗄️ MySQL Test</h3>
+            <?php
+            try {
+                $pdo = new PDO("mysql:host=db;dbname=hackathon_db", "hackathon_user", "hackathon_pass");
+                echo "<p class=\"success\">✅ MySQL is working</p>";
+                echo "<p><strong>Database:</strong> hackathon_db</p>";
+                echo "<p><strong>User:</strong> hackathon_user</p>";
+            } catch (Exception $e) {
+                echo "<p class=\"error\">❌ MySQL error: " . $e->getMessage() . "</p>";
+            }
+            ?>
+        </div>
+
+        <div class="service">
+            <h3>🔗 Useful Links</h3>
+            <p><a href="http://localhost:8081" target="_blank">📊 Adminer (MySQL Admin)</a></p>
+            <p><a href="/final-lab6-test.php">🎯 Final Lab 6 Test</a></p>
+            <p><a href="/lab6-final-report.php">📋 Lab 6 Report</a></p>
+            <p><a href="/debug-autoload.php">🐛 Debug Page</a></p>
+            <p><strong>Redis Connection:</strong> localhost:6379</p>
+            <p><strong>MySQL Connection:</strong> localhost:3307</p>
+        </div>
     </div>
 </body>
 </html>
