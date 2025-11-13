@@ -21,7 +21,7 @@ if (session_status() === PHP_SESSION_NONE) {
             background: white;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(142, 27, 27, 0.1);
         }
         h1 {
             text-align: center;
