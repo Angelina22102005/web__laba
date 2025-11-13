@@ -1,15 +1,18 @@
-﻿<?php 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+﻿<?php
+require '"'"'vendor/autoload.php'"'"';
+
+use App\RedisExample;
+use App\ElasticExample;
+use App\ClickhouseExample;
+
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lab 4 - Composer + GitHub API</title>
+    <title>Lab 6 - NoSQL Databases</title>
     <style>
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-family: '"'"'Segoe UI'"'"', Arial, sans-serif; 
             max-width: 1200px; 
             margin: 0 auto; 
             padding: 20px;
@@ -31,38 +34,22 @@ if (session_status() === PHP_SESSION_NONE) {
             margin-bottom: 25px;
             text-align: center;
         }
-        .info { 
+        .db-section { 
             background: #f8f9fa; 
             padding: 20px; 
             border-radius: 10px; 
             margin: 15px 0;
             border-left: 5px solid #3498db;
         }
-        .api-data { 
-            background: #e8f4fd; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 15px 0;
-            border-left: 5px solid #2ecc71;
-        }
-        .user-info { 
-            background: #fff3cd; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 15px 0;
-            border-left: 5px solid #ffc107;
-        }
-        .repo { 
-            border: 1px solid #dee2e6; 
-            padding: 15px; 
-            margin: 10px 0; 
-            border-radius: 8px;
-            background: white;
-            transition: transform 0.2s;
-        }
-        .repo:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .redis { border-left-color: #d63031; }
+        .elastic { border-left-color: #00b894; }
+        .clickhouse { border-left-color: #0984e3; }
+        pre {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
         }
         .nav-links {
             display: flex;
@@ -83,141 +70,138 @@ if (session_status() === PHP_SESSION_NONE) {
             background: #2980b9;
             transform: translateY(-2px);
         }
-        .tech-stack {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 10px 0;
-        }
-        .tech-tag {
-            background: #e74c3c;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .stars {
-            color: #f39c12;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
-    <div class='container'>
-        <div class='header'>
-            <h1>🚀 Лабораторная работа №4</h1>
-            <h2>Composer + GitHub API + Пользовательские классы</h2>
+    <div class='"'"'container'"'"'>
+        <div class='"'"'header'"'"'>
+            <h1>🚀 Лабораторная работа №6</h1>
+            <h2>NoSQL Databases: Redis, Elasticsearch, ClickHouse</h2>
             <p><strong>👩‍🎓 Студент:</strong> Любанская Ангелина Валерьевна | <strong>🎯 Группа:</strong> 3МО-1</p>
         </div>
-        
-        <div class='info'>
-            <h3>✅ PHP успешно работает!</h3>
-            <p><strong>📅 Текущая дата и время на сервере:</strong> <?php echo date('Y-m-d H:i:s'); ?></p>
-            <p><strong>🔄 Версия PHP:</strong> <?php echo phpversion(); ?></p>
-            <p><strong>📦 Composer Autoload:</strong> ✔️ Активен</p>
+
+        <div class='"'"'nav-links'"'"'>
+            <a href='"'"'/index.php'"'"'>🏠 Главная Lab6</a>
+            <a href='"'"'/hackathon-form.php'"'"'>📝 Регистрация на хакатон</a>
+            <a href='"'"'/view.php'"'"'>👥 Все участники</a>
         </div>
 
-        <div class='nav-links'>
-            <a href='/index.php'>🏠 Главная</a>
-            <a href='/hackathon-form.php'>📝 Регистрация на хакатон</a>
-            <a href='/view.php'>👥 Все участники</a>
-            <a href='/test-userinfo.php'>🧪 Тест UserInfo</a>
-            <a href='/test-api.php'>🧪 Тест API</a>
-        </div>
-
-        <!-- Данные из последней регистрации -->
-        <div class='info'>
-            <h3>📋 Данные из последней регистрации:</h3>
-            <?php if(isset($_SESSION['form_data'])): ?>
-                <p><strong>👤 Имя:</strong> <?= $_SESSION['form_data']['fullName'] ?></p>
-                <p><strong>🎂 Возраст:</strong> <?= $_SESSION['form_data']['age'] ?> лет</p>
-                <p><strong>📧 Email:</strong> <?= $_SESSION['form_data']['email'] ?></p>
-                <p><strong>🎯 Направление:</strong> <?= $_SESSION['form_data']['direction'] ?></p>
-                <p><strong>⚙️ Роль в команде:</strong> <?= $_SESSION['form_data']['teamRole'] ?></p>
-                <p><strong>📅 Дата регистрации:</strong> <?= $_SESSION['form_data']['registration_date'] ?></p>
-                <?php unset($_SESSION['form_data']); ?>
-            <?php else: ?>
-                <p>📭 Данных регистрации пока нет. <a href='hackathon-form.php'>Зарегистрируйтесь первым!</a></p>
-            <?php endif; ?>
-        </div>
-
-        <!-- Данные из API -->
-        <?php if(isset($_SESSION['api_data'])): ?>
-        <div class='api-data'>
-            <h3>🚀 Данные из внешних API:</h3>
+        <?php
+        // Redis Demo
+        echo "<div class='"'"'db-section redis'"'"'>";
+        echo "<h3>🔴 Redis Demo - Key/Value Store</h3>";
+        try {
+            $redis = new RedisExample();
             
-            <?php if(isset($_SESSION['api_data']['error'])): ?>
-                <p style="color: red;">❌ <?= $_SESSION['api_data']['error'] ?></p>
-            <?php else: ?>
-                <!-- Идея для хакатона -->
-                <div class='info'>
-                    <h4>💡 Случайная идея для хакатона:</h4>
-                    <p><strong><?= $_SESSION['api_data']['hackathon_idea']['idea'] ?></strong></p>
-                    <p><strong>🎯 Сложность:</strong> <?= str_repeat('⭐', $_SESSION['api_data']['hackathon_idea']['complexity']) ?></p>
-                    <div class='tech-stack'>
-                        <strong>🛠 Технологии:</strong>
-                        <?php foreach($_SESSION['api_data']['hackathon_idea']['tech_stack'] as $tech): ?>
-                            <span class='tech-tag'><?= $tech ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                
-                <!-- Репозитории GitHub -->
-                <h4>📂 Популярные репозитории GitHub:</h4>
-                <?php foreach($_SESSION['api_data']['github_repos'] as $repo): ?>
-                    <?php if(!isset($repo['error'])): ?>
-                    <div class='repo'>
-                        <strong>📁 <?= htmlspecialchars($repo['name'] ?? 'Неизвестно') ?></strong>
-                        <span class='stars'>⭐ <?= $repo['stargazers_count'] ?? 0 ?></span><br>
-                        <em>🔗 <?= htmlspecialchars($repo['full_name'] ?? '') ?></em><br>
-                        <?php if(isset($repo['description']) && $repo['description']): ?>
-                            <p>📝 <?= htmlspecialchars($repo['description']) ?></p>
-                        <?php endif; ?>
-                        <small>🌐 <a href="<?= $repo['html_url'] ?? '#' ?>" target="_blank">Открыть на GitHub</a></small>
-                    </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-                
-                <!-- Курсы валют -->
-                <div class='info'>
-                    <h4>💰 Курсы валют (USD):</h4>
-                    <?php foreach($_SESSION['api_data']['exchange_rates']['rates'] as $currency => $rate): ?>
-                        <p><strong><?= $currency ?>:</strong> <?= number_format($rate, 2) ?></p>
-                    <?php endforeach; ?>
-                    <p><small>📅 Дата: <?= $_SESSION['api_data']['exchange_rates']['date'] ?></small></p>
-                </div>
-                
-                <p><small>🕐 Обновлено API: <?= $_SESSION['api_data']['api_timestamp'] ?></small></p>
-            <?php endif; ?>
+            // Set some values
+            echo "<h4>Setting values:</h4>";
+            echo "<pre>";
+            echo $redis->setValue('"'"'movie:title'"'"', '"'"'Inception'"'"');
+            echo $redis->setValue('"'"'movie:year'"'"', '"'"'2010'"'"');
+            echo $redis->setValue('"'"'movie:director'"'"', '"'"'Christopher Nolan'"'"');
+            echo "</pre>";
             
-            <?php unset($_SESSION['api_data']); ?>
-        </div>
-        <?php endif; ?>
+            // Get values
+            echo "<h4>Getting values:</h4>";
+            echo "<pre>";
+            echo "Title: " . $redis->getValue('"'"'movie:title'"'"');
+            echo "Year: " . $redis->getValue('"'"'movie:year'"'"'); 
+            echo "Director: " . $redis->getValue('"'"'movie:director'"'"');
+            echo "</pre>";
+            
+        } catch (Exception $e) {
+            echo "<p style='"'"'color: red;'"'"'>Redis Error: " . $e->getMessage() . "</p>";
+        }
+        echo "</div>";
 
-        <!-- Информация о пользователе -->
-        <div class='user-info'>
-            <h3>👤 Информация о вашем устройстве:</h3>
-            <?php
-            require_once 'UserInfo.php';
-            $userInfo = UserInfo::getBrowserInfo();
-            ?>
-            <p><strong>🌐 IP-адрес:</strong> <?= $userInfo['ip_address'] ?></p>
-            <p><strong>🖥 Браузер:</strong> <?= $userInfo['browser'] ?></p>
-            <p><strong>💻 Платформа:</strong> <?= $userInfo['os'] ?></p>
-            <p><strong>📱 Мобильное:</strong> <?= $userInfo['is_mobile'] ? 'Да' : 'Нет' ?></p>
-            <p><strong>⏰ Время запроса:</strong> <?= $userInfo['request_time'] ?></p>
-            <p><strong>📊 Всего отправок форм:</strong> <?= UserInfo::getSubmissionCount() ?></p>
-            <p><strong>🕐 Последняя регистрация:</strong> <?= UserInfo::getLastSubmission() ?></p>
-        </div>
+        // Elasticsearch Demo
+        echo "<div class='"'"'db-section elastic'"'"'>";
+        echo "<h3>🔍 Elasticsearch Demo - Movie Catalog</h3>";
+        try {
+            $elastic = new ElasticExample();
+            
+            // Check connection
+            echo "<h4>Connection check:</h4>";
+            echo "<pre>";
+            echo $elastic->checkConnection();
+            echo "</pre>";
+            
+            // Create movies index
+            echo "<h4>Creating movies index:</h4>";
+            echo "<pre>";
+            echo $elastic->createIndex('"'"'movies'"'"');
+            echo "</pre>";
+            
+            // Index some movies
+            echo "<h4>Indexing movies:</h4>";
+            echo "<pre>";
+            $movies = [
+                ['"'"'id'"'"' => 1, '"'"'title'"'"' => '"'"'Inception'"'"', '"'"'year'"'"' => 2010, '"'"'genre'"'"' => '"'"'Sci-Fi'"'"', '"'"'rating'"'"' => 8.8],
+                ['"'"'id'"'"' => 2, '"'"'title'"'"' => '"'"'The Shawshank Redemption'"'"', '"'"'year'"'"' => 1994, '"'"'genre'"'"' => '"'"'Drama'"'"', '"'"'rating'"'"' => 9.3],
+                ['"'"'id'"'"' => 3, '"'"'title'"'"' => '"'"'The Dark Knight'"'"', '"'"'year'"'"' => 2008, '"'"'genre'"'"' => '"'"'Action'"'"', '"'"'rating'"'"' => 9.0],
+            ];
+            
+            foreach ($movies as $movie) {
+                echo $elastic->indexDocument('"'"'movies'"'"', $movie['"'"'id'"'"'], $movie);
+            }
+            echo "</pre>";
+            
+            // Search for movies
+            echo "<h4>Searching for Sci-Fi movies:</h4>";
+            echo "<pre>";
+            echo $elastic->search('"'"'movies'"'"', ['"'"'match'"'"' => ['"'"'genre'"'"' => '"'"'Sci-Fi'"'"']]);
+            echo "</pre>";
+            
+        } catch (Exception $e) {
+            echo "<p style='"'"'color: red;'"'"'>Elasticsearch Error: " . $e->getMessage() . "</p>";
+        }
+        echo "</div>";
 
-        <!-- Информация о сервере -->
-        <div class='info'>
-            <h4>🔧 Информация о сервере:</h4>
-            <p><strong>🏠 Имя сервера:</strong> <?= $_SERVER['SERVER_NAME'] ?></p>
-            <p><strong>🔌 Порт:</strong> <?= $_SERVER['SERVER_PORT'] ?></p>
-            <p><strong>⚙️ Software:</strong> <?= $_SERVER['SERVER_SOFTWARE'] ?></p>
-        </div>
+        // ClickHouse Demo
+        echo "<div class='"'"'db-section clickhouse'"'"'>";
+        echo "<h3>⚡️ ClickHouse Demo - Movie Analytics</h3>";
+        try {
+            $clickhouse = new ClickhouseExample();
+            
+            // Create table
+            echo "<h4>Creating movies table:</h4>";
+            echo "<pre>";
+            echo $clickhouse->createTable();
+            echo "</pre>";
+            
+            // Insert movies
+            echo "<h4>Inserting movies:</h4>";
+            echo "<pre>";
+            $movies = [
+                [1, '"'"'Inception'"'"', 2010, '"'"'Sci-Fi'"'"', 8.8],
+                [2, '"'"'The Shawshank Redemption'"'"', 1994, '"'"'Drama'"'"', 9.3],
+                [3, '"'"'The Dark Knight'"'"', 2008, '"'"'Action'"'"', 9.0],
+                [4, '"'"'Pulp Fiction'"'"', 1994, '"'"'Crime'"'"', 8.9],
+                [5, '"'"'Forrest Gump'"'"', 1994, '"'"'Drama'"'"', 8.8],
+            ];
+            
+            foreach ($movies as $movie) {
+                echo $clickhouse->insertMovie($movie[0], $movie[1], $movie[2], $movie[3], $movie[4]);
+            }
+            echo "</pre>";
+            
+            // Get movies
+            echo "<h4>All movies:</h4>";
+            echo "<pre>";
+            echo $clickhouse->getMovies();
+            echo "</pre>";
+            
+            // Get stats
+            echo "<h4>Movie statistics:</h4>";
+            echo "<pre>";
+            echo $clickhouse->getStats();
+            echo "</pre>";
+            
+        } catch (Exception $e) {
+            echo "<p style='"'"'color: red;'"'"'>ClickHouse Error: " . $e->getMessage() . "</p>";
+        }
+        echo "</div>";
+        ?>
     </div>
 </body>
 </html>
