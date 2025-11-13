@@ -1,28 +1,18 @@
 ﻿FROM php:8.2-fpm
 
-# Устанавливаем системные зависимости
 RUN apt-get update && apt-get install -y \
+    unzip \
     git \
     curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql zip
 
-# Очищаем кэш
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Устанавливаем Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Устанавливаем расширения PHP
-RUN docker-php-ext-install pdo pdo_mysql mysqli mbstring exif pcntl bcmath gd
-
-# Создаем рабочую директорию
 WORKDIR /var/www/html
-
-# Копируем файлы проекта
 COPY ./www /var/www/html
 
-# Меняем владельца файлов
-RUN chown -R www-data:www-data /var/www/html
+RUN composer install
 
 CMD ["php-fpm"]
