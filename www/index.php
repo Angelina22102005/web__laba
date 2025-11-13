@@ -1,5 +1,5 @@
 ﻿<?php
-require '"'"'vendor/autoload.php'"'"';
+require 'vendor/autoload.php';
 
 use App\RedisExample;
 use App\ElasticExample;
@@ -12,7 +12,7 @@ use App\ClickhouseExample;
     <title>Lab 6 - NoSQL Databases</title>
     <style>
         body { 
-            font-family: '"'"'Segoe UI'"'"', Arial, sans-serif; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
             max-width: 1200px; 
             margin: 0 auto; 
             padding: 20px;
@@ -73,134 +73,93 @@ use App\ClickhouseExample;
     </style>
 </head>
 <body>
-    <div class='"'"'container'"'"'>
-        <div class='"'"'header'"'"'>
+    <div class='container'>
+        <div class='header'>
             <h1>🚀 Лабораторная работа №6</h1>
             <h2>NoSQL Databases: Redis, Elasticsearch, ClickHouse</h2>
             <p><strong>👩‍🎓 Студент:</strong> Любанская Ангелина Валерьевна | <strong>🎯 Группа:</strong> 3МО-1</p>
         </div>
 
-        <div class='"'"'nav-links'"'"'>
-            <a href='"'"'/index.php'"'"'>🏠 Главная Lab6</a>
-            <a href='"'"'/hackathon-form.php'"'"'>📝 Регистрация на хакатон</a>
-            <a href='"'"'/view.php'"'"'>👥 Все участники</a>
+        <div class='nav-links'>
+            <a href='/index.php'>🏠 Главная Lab6</a>
+            <a href='/hackathon-form.php'>📝 Регистрация на хакатон</a>
+            <a href='/view.php'>👥 Все участники</a>
+            <a href='/lab6-report.php'>📊 Отчет Lab6</a>
+            <a href='/final-test.php'>🧪 Тестирование</a>
         </div>
 
         <?php
         // Redis Demo
-        echo "<div class='"'"'db-section redis'"'"'>";
-        echo "<h3>🔴 Redis Demo - Key/Value Store</h3>";
+        echo \"<div class='db-section redis'>\";
+        echo \"<h3>🔴 Redis Demo - Key/Value Store</h3>\";
         try {
-            $redis = new RedisExample();
+            \ = new RedisExample();
             
             // Set some values
-            echo "<h4>Setting values:</h4>";
-            echo "<pre>";
-            echo $redis->setValue('"'"'movie:title'"'"', '"'"'Inception'"'"');
-            echo $redis->setValue('"'"'movie:year'"'"', '"'"'2010'"'"');
-            echo $redis->setValue('"'"'movie:director'"'"', '"'"'Christopher Nolan'"'"');
-            echo "</pre>";
+            echo \"<h4>Setting values:</h4>\";
+            echo \"<pre>\";
+            echo \->setValue('movie:title', 'Inception');
+            echo \->setValue('movie:year', '2010');
+            echo \->setValue('movie:director', 'Christopher Nolan');
+            echo \"</pre>\";
             
             // Get values
-            echo "<h4>Getting values:</h4>";
-            echo "<pre>";
-            echo "Title: " . $redis->getValue('"'"'movie:title'"'"');
-            echo "Year: " . $redis->getValue('"'"'movie:year'"'"'); 
-            echo "Director: " . $redis->getValue('"'"'movie:director'"'"');
-            echo "</pre>";
+            echo \"<h4>Getting values:</h4>\";
+            echo \"<pre>\";
+            echo \"Title: \" . \->getValue('movie:title');
+            echo \"Year: \" . \->getValue('movie:year'); 
+            echo \"Director: \" . \->getValue('movie:director');
+            echo \"</pre>\";
             
-        } catch (Exception $e) {
-            echo "<p style='"'"'color: red;'"'"'>Redis Error: " . $e->getMessage() . "</p>";
+        } catch (Exception \) {
+            echo \"<p style='color: red;'>Redis Error: \" . \->getMessage() . \"</p>\";
         }
-        echo "</div>";
+        echo \"</div>\";
 
-        // Elasticsearch Demo
-        echo "<div class='"'"'db-section elastic'"'"'>";
-        echo "<h3>🔍 Elasticsearch Demo - Movie Catalog</h3>";
+        // Service Status
+        echo \"<div class='db-section'>\";
+        echo \"<h3>🌐 Service Status</h3>\";
+        
+        // Check Redis
         try {
-            $elastic = new ElasticExample();
-            
-            // Check connection
-            echo "<h4>Connection check:</h4>";
-            echo "<pre>";
-            echo $elastic->checkConnection();
-            echo "</pre>";
-            
-            // Create movies index
-            echo "<h4>Creating movies index:</h4>";
-            echo "<pre>";
-            echo $elastic->createIndex('"'"'movies'"'"');
-            echo "</pre>";
-            
-            // Index some movies
-            echo "<h4>Indexing movies:</h4>";
-            echo "<pre>";
-            $movies = [
-                ['"'"'id'"'"' => 1, '"'"'title'"'"' => '"'"'Inception'"'"', '"'"'year'"'"' => 2010, '"'"'genre'"'"' => '"'"'Sci-Fi'"'"', '"'"'rating'"'"' => 8.8],
-                ['"'"'id'"'"' => 2, '"'"'title'"'"' => '"'"'The Shawshank Redemption'"'"', '"'"'year'"'"' => 1994, '"'"'genre'"'"' => '"'"'Drama'"'"', '"'"'rating'"'"' => 9.3],
-                ['"'"'id'"'"' => 3, '"'"'title'"'"' => '"'"'The Dark Knight'"'"', '"'"'year'"'"' => 2008, '"'"'genre'"'"' => '"'"'Action'"'"', '"'"'rating'"'"' => 9.0],
-            ];
-            
-            foreach ($movies as $movie) {
-                echo $elastic->indexDocument('"'"'movies'"'"', $movie['"'"'id'"'"'], $movie);
+            if (extension_loaded('redis')) {
+                \ = new Redis();
+                if (\->connect('redis', 6379, 2)) {
+                    echo \"<p style='color: green;'>✅ Redis: Connected and working</p>\";
+                } else {
+                    echo \"<p style='color: red;'>❌ Redis: Connection failed</p>\";
+                }
+            } else {
+                echo \"<p style='color: orange;'>⚠️ Redis extension not loaded</p>\";
             }
-            echo "</pre>";
-            
-            // Search for movies
-            echo "<h4>Searching for Sci-Fi movies:</h4>";
-            echo "<pre>";
-            echo $elastic->search('"'"'movies'"'"', ['"'"'match'"'"' => ['"'"'genre'"'"' => '"'"'Sci-Fi'"'"']]);
-            echo "</pre>";
-            
-        } catch (Exception $e) {
-            echo "<p style='"'"'color: red;'"'"'>Elasticsearch Error: " . $e->getMessage() . "</p>";
+        } catch (Exception \) {
+            echo \"<p style='color: red;'>❌ Redis Error: \" . \->getMessage() . \"</p>\";
         }
-        echo "</div>";
+        
+        // Check MySQL
+        try {
+            \ = new PDO('mysql:host=db;dbname=hackathon_db', 'hackathon_user', 'hackathon_pass');
+            echo \"<p style='color: green;'>✅ MySQL: Connected and working</p>\";
+        } catch (Exception \) {
+            echo \"<p style='color: red;'>❌ MySQL Error: \" . \->getMessage() . \"</p>\";
+        }
+        
+        echo \"</div>\";
 
-        // ClickHouse Demo
-        echo "<div class='"'"'db-section clickhouse'"'"'>";
-        echo "<h3>⚡️ ClickHouse Demo - Movie Analytics</h3>";
+        // PHP Info
+        echo \"<div class='db-section'>\";
+        echo \"<h3>🐘 PHP Information</h3>\";
+        echo \"<p><strong>PHP Version:</strong> \" . phpversion() . \"</p>\";
+        echo \"<p><strong>Server Time:</strong> \" . date('Y-m-d H:i:s') . \"</p>\";
+        
+        // Check autoload
         try {
-            $clickhouse = new ClickhouseExample();
-            
-            // Create table
-            echo "<h4>Creating movies table:</h4>";
-            echo "<pre>";
-            echo $clickhouse->createTable();
-            echo "</pre>";
-            
-            // Insert movies
-            echo "<h4>Inserting movies:</h4>";
-            echo "<pre>";
-            $movies = [
-                [1, '"'"'Inception'"'"', 2010, '"'"'Sci-Fi'"'"', 8.8],
-                [2, '"'"'The Shawshank Redemption'"'"', 1994, '"'"'Drama'"'"', 9.3],
-                [3, '"'"'The Dark Knight'"'"', 2008, '"'"'Action'"'"', 9.0],
-                [4, '"'"'Pulp Fiction'"'"', 1994, '"'"'Crime'"'"', 8.9],
-                [5, '"'"'Forrest Gump'"'"', 1994, '"'"'Drama'"'"', 8.8],
-            ];
-            
-            foreach ($movies as $movie) {
-                echo $clickhouse->insertMovie($movie[0], $movie[1], $movie[2], $movie[3], $movie[4]);
-            }
-            echo "</pre>";
-            
-            // Get movies
-            echo "<h4>All movies:</h4>";
-            echo "<pre>";
-            echo $clickhouse->getMovies();
-            echo "</pre>";
-            
-            // Get stats
-            echo "<h4>Movie statistics:</h4>";
-            echo "<pre>";
-            echo $clickhouse->getStats();
-            echo "</pre>";
-            
-        } catch (Exception $e) {
-            echo "<p style='"'"'color: red;'"'"'>ClickHouse Error: " . $e->getMessage() . "</p>";
+            require_once 'vendor/autoload.php';
+            echo \"<p style='color: green;'>✅ Composer autoload is working</p>\";
+        } catch (Exception \) {
+            echo \"<p style='color: red;'>❌ Autoload error: \" . \->getMessage() . \"</p>\";
         }
-        echo "</div>";
+        echo \"</div>\";
         ?>
     </div>
 </body>
