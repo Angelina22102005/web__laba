@@ -2,94 +2,91 @@
 
 namespace App;
 
-use Kafka\Producer;
-use Kafka\ProducerConfig;
-use Kafka\Consumer;
-use Kafka\ConsumerConfig;
-
 class QueueManager 
 {
-    private \ = 'lab7_topic';
+    private $queueFile = "message_queue.txt";
+    private $processedFile = "processed_messages.log";
 
-    public function publish(\) 
+    public function publish($data) 
     {
         try {
-            \ = ProducerConfig::getInstance();
-            \->setMetadataBrokerList('kafka:9092');
-
-            \ = new Producer(function() use (\) {
-                return [[
-                    'topic' => \->topic,
-                    'value' => json_encode(\),
-                    'key' => '',
-                ]];
-            });
-
-            \->send(true);
+            $message = [
+                "id" => uniqid(),
+                "timestamp" => date("Y-m-d H:i:s"),
+                "data" => $data
+            ];
+            
+            $queueEntry = json_encode($message, JSON_UNESCAPED_UNICODE) . PHP_EOL;
+            file_put_contents($this->queueFile, $queueEntry, FILE_APPEND);
+            
             return true;
-        } catch (\\Exception \) {
-            // Fallback: сохраняем в файл если Kafka недоступен
-            \->saveToFile(\);
+        } catch (\Exception $e) {
+            error_log("Queue publish error: " . $e->getMessage());
             return false;
         }
     }
 
-    public function consume(callable \) 
+    public function consume($callback) 
     {
-        try {
-            \ = ConsumerConfig::getInstance();
-            \->setMetadataBrokerList('kafka:9092');
-            \->setGroupId('lab7_group');
-            \->setTopics([\->topic]);
-            \->setOffsetReset('earliest');
-
-            \ = new Consumer();
-            \->start(function(\, \, \) use (\) {
-                if (isset(\['message']['value'])) {
-                    \ = json_decode(\['message']['value'], true);
-                    \(\);
+        echo "🔮 File System Queue Worker Started\n";
+        echo "📁 Reading from: {$this->queueFile}\n";
+        
+        while (true) {
+            if (file_exists($this->queueFile) && filesize($this->queueFile) > 0) {
+                $content = file_get_contents($this->queueFile);
+                $lines = explode(PHP_EOL, trim($content));
+                
+                foreach ($lines as $line) {
+                    if (!empty(trim($line))) {
+                        $message = json_decode($line, true);
+                        if ($message) {
+                            echo "📥 Received message: " . json_encode($message["data"]) . "\n";
+                            
+                            // Вызываем callback для обработки
+                            $callback($message["data"]);
+                            
+                            // Сохраняем в лог обработанных
+                            $logEntry = "[" . date("Y-m-d H:i:s") . "] ✅ Processed: " . 
+                                       $message["data"]["name"] . " - " . $message["data"]["message"] . PHP_EOL;
+                            file_put_contents($this->processedFile, $logEntry, FILE_APPEND);
+                            
+                            echo "✅ Processed message ID: {$message["id"]}\n";
+                        }
+                    }
                 }
-            });
-        } catch (\\Exception \) {
-            // Fallback: читаем из файла
-            \->consumeFromFile(\);
+                
+                // Очищаем файл очереди после обработки
+                file_put_contents($this->queueFile, "");
+            }
+            
+            sleep(2); // Проверяем каждые 2 секунды
         }
     }
 
     public function testConnection()
     {
-        try {
-            \ = @fsockopen('kafka', 9092, \, \, 3);
-            if (\) {
-                fclose(\);
-                return true;
-            }
-            return false;
-        } catch (\\Exception \) {
-            return false;
-        }
+        return true; // Файловая система всегда доступна
     }
 
-    private function saveToFile(\)
+    public function getQueueStats()
     {
-        \ = 'fallback_messages.log';
-        \ = '[' . date('Y-m-d H:i:s') . '] FALLBACK: ' . json_encode(\) . PHP_EOL;
-        file_put_contents(\, \, FILE_APPEND);
-    }
-
-    private function consumeFromFile(callable \)
-    {
-        \ = 'fallback_messages.log';
-        if (file_exists(\)) {
-            \ = file(\, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            foreach (\ as \) {
-                if (preg_match('/FALLBACK: (.+)/', \, \)) {
-                    \ = json_decode(\[1], true);
-                    \(\);
-                }
-            }
-            // Очищаем файл после обработки
-            file_put_contents(\, '');
+        $stats = [
+            "queue_size" => 0,
+            "processed_count" => 0,
+            "queue_file_exists" => file_exists($this->queueFile),
+            "processed_file_exists" => file_exists($this->processedFile)
+        ];
+        
+        if ($stats["queue_file_exists"]) {
+            $content = file_get_contents($this->queueFile);
+            $stats["queue_size"] = count(array_filter(explode(PHP_EOL, $content)));
         }
+        
+        if ($stats["processed_file_exists"]) {
+            $content = file_get_contents($this->processedFile);
+            $stats["processed_count"] = count(array_filter(explode(PHP_EOL, $content)));
+        }
+        
+        return $stats;
     }
 }
