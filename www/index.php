@@ -1,87 +1,83 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Lab 6 - NoSQL Databases</title>
+    <title>Lab 7 - File System Queue</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background: #f0f2f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
         .header { background: #2c3e50; color: white; padding: 30px; border-radius: 10px; margin-bottom: 25px; text-align: center; }
-        .service { background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 10px; border-left: 5px solid #3498db; }
-        .success { color: green; font-weight: bold; }
-        .error { color: red; font-weight: bold; }
-        .redis-section { border-left-color: #d63031; }
+        .stats { display: flex; gap: 20px; margin: 20px 0; }
+        .stat { flex: 1; background: #e8f4fd; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #2c3e50; }
+        .nav-links { display: flex; gap: 15px; margin: 20px 0; }
+        .nav-links a { padding: 12px 25px; background: #3498db; color: white; text-decoration: none; border-radius: 25px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 Lab 6 - NoSQL Databases</h1>
-            <p>Redis + MySQL with Docker - WORKING VERSION</p>
+            <h1>📨 Лабораторная работа №7</h1>
+            <p>File System Queue - Асинхронная обработка</p>
+            <p><strong>👩‍🎓 Студент:</strong> Любанская Ангелина Валерьевна | <strong>🎯 Группа:</strong> 3МО-1</p>
         </div>
 
-        <div class="service">
-            <h3>📊 System Status</h3>
-            <?php
-            echo "<p><strong>PHP Version:</strong> " . phpversion() . "</p>";
-            echo "<p><strong>Server Time:</strong> " . date("Y-m-d H:i:s") . "</p>";
-            ?>
+        <?php
+        // Простая статистика
+        $queueSize = 0;
+        if (file_exists("message_queue.txt")) {
+            $content = file_get_contents("message_queue.txt");
+            $queueSize = count(array_filter(explode(PHP_EOL, $content)));
+        }
+
+        $processedCount = 0;
+        if (file_exists("processed_messages.log")) {
+            $content = file_get_contents("processed_messages.log");
+            $processedCount = count(array_filter(explode(PHP_EOL, $content)));
+        }
+        ?>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number"><?php echo $queueSize; ?></div>
+                <div>Сообщений в очереди</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number"><?php echo $processedCount; ?></div>
+                <div>Обработано сообщений</div>
+            </div>
         </div>
 
-        <div class="service redis-section">
-            <h3>🔴 Redis Test with RedisExample Class</h3>
-            <?php
-            // Simple direct autoload for main page
-            spl_autoload_register(function ($class_name) {
-                $file = __DIR__ . "/" . str_replace("\\", "/", $class_name) . ".php";
-                if (file_exists($file)) {
-                    require $file;
-                }
-            });
-
-            if (class_exists("App\\RedisExample")) {
-                try {
-                    $redis = new App\RedisExample();
-                    
-                    // Test operations
-                    $setResult = $redis->setValue("homepage_test", "Hello from Lab 6 homepage!");
-                    $getResult = $redis->getValue("homepage_test");
-                    
-                    echo "<p class=\"success\">✅ RedisExample class is working!</p>";
-                    echo "<p><strong>SET operation:</strong> $setResult</p>";
-                    echo "<p><strong>GET operation:</strong> $getResult</p>";
-                    echo "<p class=\"success\">✅ Redis extension is loaded and working</p>";
-                    
-                } catch (Exception $e) {
-                    echo "<p class=\"error\">❌ Redis error: " . $e->getMessage() . "</p>";
-                }
-            } else {
-                echo "<p class=\"error\">❌ RedisExample class not available</p>";
-            }
-            ?>
+        <div class="nav-links">
+            <a href="/send.php">📤 Отправить сообщение</a>
+            <a href="/worker.php" target="_blank">👷 Запустить Worker</a>
+            <a href="/status.php">📊 Статус системы</a>
         </div>
 
-        <div class="service">
-            <h3>🗄️ MySQL Test</h3>
-            <?php
-            try {
-                $pdo = new PDO("mysql:host=db;dbname=hackathon_db", "hackathon_user", "hackathon_pass");
-                echo "<p class=\"success\">✅ MySQL is working</p>";
-                echo "<p><strong>Database:</strong> hackathon_db</p>";
-                echo "<p><strong>User:</strong> hackathon_user</p>";
-            } catch (Exception $e) {
-                echo "<p class=\"error\">❌ MySQL error: " . $e->getMessage() . "</p>";
-            }
-            ?>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>🎯 Как работает система:</h3>
+            <ol>
+                <li>📤 Отправьте сообщение через форму</li>
+                <li>📁 Сообщение сохраняется в файл очереди</li>
+                <li>👷 Worker читает сообщения из файла</li>
+                <li>✅ Сообщения обрабатываются и сохраняются в лог</li>
+            </ol>
         </div>
 
-        <div class="service">
-            <h3>🔗 Useful Links</h3>
-            <p><a href="http://localhost:8081" target="_blank">📊 Adminer (MySQL Admin)</a></p>
-            <p><a href="/final-lab6-test.php">🎯 Final Lab 6 Test</a></p>
-            <p><a href="/lab6-final-report.php">📋 Lab 6 Report</a></p>
-            <p><a href="/debug-autoload.php">🐛 Debug Page</a></p>
-            <p><strong>Redis Connection:</strong> localhost:6379</p>
-            <p><strong>MySQL Connection:</strong> localhost:3307</p>
+        <div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <h3>📝 Последние обработанные сообщения:</h3>
+            <pre style="background: #2d3436; color: white; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+<?php
+if (file_exists("processed_messages.log")) {
+    $logContent = file_get_contents("processed_messages.log");
+    $lines = array_slice(array_filter(explode(PHP_EOL, $logContent)), -10);
+    foreach (array_reverse($lines) as $line) {
+        echo htmlspecialchars($line) . "\n";
+    }
+} else {
+    echo "Лог файл пока пуст";
+}
+?>
+            </pre>
         </div>
     </div>
 </body>
