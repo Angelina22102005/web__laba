@@ -1,0 +1,68 @@
+﻿version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: lab7-nginx
+    ports:
+      - '8080:80'
+    volumes:
+      - ./www:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - lab7-network
+
+  php:
+    build: .
+    container_name: lab7-php
+    volumes:
+      - ./www:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - lab7-network
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: lab7-zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - '2181:2181'
+    networks:
+      - lab7-network
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: lab7-kafka
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+    environment:
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+    networks:
+      - lab7-network
+
+  adminer:
+    image: adminer
+    container_name: lab7-adminer
+    ports:
+      - '8081:8080'
+    networks:
+      - lab7-network
+
+networks:
+  lab7-network:
+    driver: bridge
